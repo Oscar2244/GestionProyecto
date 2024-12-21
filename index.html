@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Proyectos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body id="body">
+    <h1>Gestión de Proyectos</h1>
+
+    <!-- Botón para cambiar de tema (modo claro/oscuro) -->
+    <button onclick="toggleTheme()">Cambiar Modo</button>
+
+    <!-- Formulario para agregar un nuevo registro en la tabla -->
+    <div id="form-container">
+        <h2>Agregar Tarea</h2>
+        <input type="text" id="nombreTarea" placeholder="Nombre de la Tarea" required>
+        <input type="text" id="descripcionTarea" placeholder="Descripción de la Tarea" required>
+        <input type="date" id="fechaLimite" required>
+        <label for="estadoTarea">Estado:</label>
+        <select id="estadoTarea">
+            <option value="false">Pendiente</option>
+            <option value="true">Completada</option>
+        </select>
+        <button onclick="agregarTarea()">Agregar Tarea</button>
+    </div>
+
+    <div id="proyectos-container">
+        <!-- Los proyectos y tareas se cargarán aquí dinámicamente -->
+    </div>
+
+    <script>
+        let data = {
+            "proyectos": [
+                {
+                    "id": 1,
+                    "nombre": "Proyecto Clínica Odontológica",
+                    "descripcion": "Desarrollo de un sistema de gestión para la clínica",
+                    "tareas": [
+                        {
+                            "id": 1,
+                            "nombre": "Diseñar la base de datos",
+                            "descripcion": "Definir las tablas, campos y relaciones para almacenar",
+                            "estado_completo": false,
+                            "fecha_limite": "2024-12-01"
+                        },
+                        {
+                            "id": 2,
+                            "nombre": "Implementar backend",
+                            "descripcion": "Crear las APIs necesarias para gestionar las operaciones",
+                            "estado_completo": true,
+                            "fecha_limite": "2024-12-15"
+                        },
+                        {
+                            "id": 3,
+                            "nombre": "Diseño de UI/UX",
+                            "descripcion": "Desarrollar una interfaz amigable",
+                            "estado_completo": true,
+                            "fecha_limite": "2024-11-20"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        const container = document.getElementById('proyectos-container');
+
+        // Función para renderizar los proyectos y las tareas
+        function renderProyectos() {
+            container.innerHTML = ''; // Limpiar el contenedor
+            data.proyectos.forEach(proyecto => {
+                const proyectoDiv = document.createElement('div');
+                proyectoDiv.classList.add('proyecto');
+                proyectoDiv.innerHTML = `
+                    <h2>${proyecto.nombre}</h2>
+                    <p>${proyecto.descripcion}</p>
+                    <button onclick="eliminarProyecto(${proyecto.id})">Eliminar Proyecto</button>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Fecha Límite</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${proyecto.tareas.map(tarea => `
+                                <tr id="tarea-${tarea.id}">
+                                    <td>${tarea.id}</td>
+                                    <td>${tarea.nombre}</td>
+                                    <td>${tarea.descripcion}</td>
+                                    <td class="${tarea.estado_completo ? 'completed' : 'pending'}">
+                                        ${tarea.estado_completo ? 'Completada' : 'Pendiente'}
+                                    </td>
+                                    <td>${tarea.fecha_limite}</td>
+                                    <td><button onclick="eliminarTarea(${proyecto.id}, ${tarea.id})">Eliminar</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                container.appendChild(proyectoDiv);
+            });
+        }
+
+        // Función para agregar una tarea a un proyecto específico
+        function agregarTarea() {
+            const nombreTarea = document.getElementById('nombreTarea').value;
+            const descripcionTarea = document.getElementById('descripcionTarea').value;
+            const fechaLimite = document.getElementById('fechaLimite').value;
+            const estadoTarea = document.getElementById('estadoTarea').value === 'true';
+
+            if (nombreTarea && descripcionTarea && fechaLimite) {
+                const nuevaTarea = {
+                    id: data.proyectos[0].tareas.length + 1,
+                    nombre: nombreTarea,
+                    descripcion: descripcionTarea,
+                    estado_completo: estadoTarea,
+                    fecha_limite: fechaLimite
+                };
+
+                // Agregar la nueva tarea al primer proyecto
+                data.proyectos[0].tareas.push(nuevaTarea);
+                renderProyectos();  // Volver a renderizar la vista con los nuevos datos
+
+                // Limpiar el formulario después de agregar la tarea
+                document.getElementById('nombreTarea').value = '';
+                document.getElementById('descripcionTarea').value = '';
+                document.getElementById('fechaLimite').value = '';
+                document.getElementById('estadoTarea').value = 'false';  // Estado pendiente por defecto
+            } else {
+                alert('Por favor, complete todos los campos.');
+            }
+        }
+
+        // Función para eliminar un proyecto
+        function eliminarProyecto(id) {
+            const proyectoIndex = data.proyectos.findIndex(proyecto => proyecto.id === id);
+            if (proyectoIndex > -1) {
+                data.proyectos.splice(proyectoIndex, 1);
+                renderProyectos();
+            }
+        }
+
+        // Función para eliminar una tarea
+        function eliminarTarea(proyectoId, tareaId) {
+            const proyecto = data.proyectos.find(p => p.id === proyectoId);
+            if (proyecto) {
+                const tareaIndex = proyecto.tareas.findIndex(tarea => tarea.id === tareaId);
+                if (tareaIndex > -1) {
+                    proyecto.tareas.splice(tareaIndex, 1);
+                    renderProyectos();
+                }
+            }
+        }
+
+        // Función para cambiar el tema entre modo claro y modo oscuro
+        function toggleTheme() {
+            const body = document.getElementById('body');
+            body.classList.toggle('dark-mode');  // Alterna entre modo oscuro y claro
+        }
+
+        // Renderizar los proyectos y tareas al cargar la página
+        renderProyectos();
+    </script>
+</body>
+</html>

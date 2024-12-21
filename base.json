@@ -1,0 +1,32 @@
+{
+    "proyectos": [
+        {
+            "id": 1,
+            "nombre": "proyecto Clínica Odontológica",
+            "descripcion": "Desarrollo de un sistema de gestión para la clínica :",
+            "tareas": [
+                {
+                    "id": 1,
+                    "nombre": "Diseñar la base de datos",
+                    "descripcion": "Definir las tablas, campos y relaciones para almacenar",
+                    "estado_completado": false,
+                    "fecha_limite": "2024-12-01"
+                },
+                {
+                    "id": 2,
+                    "nombre": "Implementar backend",
+                    "descripcion": "Crear las APIs necesarias para gestionar las operaciones",
+                    "estado_completo": true,
+                    "fecha_limite": "2024-12-15"
+                },
+                {
+                    "id": 3,
+                    "nombre": "Diseno de UI/UX",
+                    "descripcion": "Desarrollar una interfaz amigable",
+                    "estado_completo": true,
+                    "fecha_limite": "2024-11-20"
+                }
+            ]
+        }
+    ]
+}
